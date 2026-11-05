@@ -11,3 +11,4 @@
 .concept-portrait.scene-object-live{background-image:linear-gradient(145deg,#123c54,#0a2b45)!important}
 
 .v2-page-hero{position:relative;isolation:isolate;overflow:hidden}
+.hero-cloud-mark circle,.diagram-cloud circle{animation:none!important;transform:none!important}
