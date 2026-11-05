@@ -1,0 +1,31 @@
+/* Shared image language for templates, including results rendered by filters. */
+const conceptArt={creation:'assets/creation-v6.webp',order:'assets/order-v6.webp',orbital:'assets/orbital-v6.webp'};
+const conceptForService=id=>conceptArt[id==='ip'?'creation':id==='reputation'?'order':'orbital'];
+function conceptFigure(src,label,cls=''){return `<figure class="concept-figure ${cls}"><img src="${src}" alt="" width="1672" height="941" loading="lazy"><figcaption>${label}</figcaption></figure>`}
+const cardsBeforeV7=serviceCards;
+serviceCards=function(){let i=0;return cardsBeforeV7().replaceAll('<article class="service-card">',()=>{const s=C.services[i++];return `<article class="service-card visual-service-card">${conceptFigure(conceptForService(s.id),s.title+' / DIGITAL RIGHTS','service-concept')}`})};
+const peopleBeforeV7=teamCards;
+teamCards=function(list=C.team){let i=0;return peopleBeforeV7(list).replaceAll('<div class="portrait">',()=>`<div class="portrait concept-portrait" style="--portrait-art:url('${conceptForService(list[i++].service)}')">`)};
+const casesBeforeV7=caseCards;
+caseCards=function(list=C.cases){let i=0;return casesBeforeV7(list).replace(/<img src="[^"]+" alt="示例业务场景抽象图" loading="lazy">/g,()=>`<img src="${conceptForService(list[i++].service)}" alt="数字权益场景抽象概念图" loading="lazy">`)};
+const rowsBeforeV7=articleRows;
+articleRows=function(list=C.articles){let i=0;return rowsBeforeV7(list).replaceAll('<span class="category">',()=>{const a=list[i++];return `<span class="article-concept" aria-hidden="true"><img src="${conceptForService(a.service)}" alt="" width="1672" height="941" loading="lazy"></span><span class="category">`})};
+const articleBeforeV7=article;
+article=function(a){return articleBeforeV7(a).replace('<div class="article-related">',conceptFigure(conceptForService(a.service),'数字时代的权益观察 · 云拯概念视觉','reading-concept')+'<div class="article-related">')};
+const serviceBeforeV7=serviceDetail;
+serviceDetail=function(s){return serviceBeforeV7(s).replace('<aside class="aside-box">','<aside class="aside-box">'+conceptFigure(conceptForService(s.id),'连接专业与数字世界','aside-concept'))};
+const caseBeforeV7=caseDetail;
+caseDetail=function(c){return caseBeforeV7(c).replace('<aside class="aside-box">','<aside class="aside-box">'+conceptFigure(conceptForService(c.service),'从场景理解数字权益','aside-concept'))};
+const profileBeforeV7=profile;
+profile=function(t){return profileBeforeV7(t).replace('<div class="portrait">',`<div class="portrait concept-portrait" style="--portrait-art:url('${conceptForService(t.service)}')">`)};
+const contactBeforeV7=contact;
+contact=function(){return contactBeforeV7().replace('<div class="map-placeholder">',conceptFigure(conceptArt.orbital,'云端连接 · 从一次沟通开始','contact-concept')+'<div class="map-placeholder">')};
+const bindBeforeV7=bindPage;
+bindPage=function(){bindBeforeV7();const [page,id]=(location.hash.slice(2)||'home').split('/');let service=id;
+  document.querySelectorAll('.case-card').forEach(card=>{const href=card.querySelector('a[href^="#/cases/"]')?.getAttribute('href');const item=C.cases.find(c=>href==='#/cases/'+c.id);const img=card.querySelector('.case-art img');if(item&&img)img.src=conceptForService(item.service)});
+  if(page==='team')service=C.team.find(t=>t.id===id)?.service;
+  if(page==='insights')service=C.articles.find(a=>a.id===id)?.service;
+  if(page==='cases')service=C.cases.find(c=>c.id===id)?.service;
+  const banner=document.querySelector('.page-art img');if(banner)banner.src=id&&service?conceptForService(service):page==='services'?conceptArt.creation:page==='insights'||page==='cases'?conceptArt.order:conceptArt.orbital;
+};
+firstV2Render=true;render();
